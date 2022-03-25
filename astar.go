@@ -115,6 +115,8 @@ func (a *astar) FindPath(startNode, endNode Node) ([]Node, error) {
 	defer func() {
 		a.openList.Clear()
 		a.closedList.Clear()
+		// Reinit for subsequent FindPath usages
+		a.init()
 	}()
 
 	a.openList.Add(startNode)
