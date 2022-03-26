@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"time"
 )
 
 // Config holds important settings
@@ -107,7 +108,8 @@ func (a *astar) IsEndNode(checkNode, endNode Node) bool {
 // The return value will be the fastest way represented as a nodes slice
 //
 // If no path was found it returns nil and an error
-func (a *astar) FindPath(startNode, endNode Node) ([]Node, error) {
+func (a *astar) FindPath(startNode, endNode Node, timeoutMs int64) ([]Node, error) {
+	start_time := time.Now().UnixMilli()
 
 	a.startNode = startNode
 	a.endNode = endNode
@@ -134,6 +136,10 @@ func (a *astar) FindPath(startNode, endNode Node) ([]Node, error) {
 		// we found the path
 		if a.IsEndNode(currentNode, endNode) {
 			return a.getNodePath(currentNode), nil
+		}
+
+		if time.Now().UnixMilli()-start_time > timeoutMs {
+			return nil, errors.New("Timed out")
 		}
 
 		neighbors := a.GetNeighborNodes(currentNode)
